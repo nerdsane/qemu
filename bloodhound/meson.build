@@ -17,3 +17,6 @@ libbloodhound = static_library('bloodhound',
                                 build_by_default: false)
 
 bloodhound = declare_dependency(link_whole: libbloodhound)
+
+# QMP command implementation (added to system target)
+system_ss.add(files('qmp.c'))

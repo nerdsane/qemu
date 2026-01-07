@@ -1,0 +1,148 @@
+# -*- Mode: Python -*-
+# vim: filetype=python
+#
+# Bloodhound Deterministic Simulation Control
+#
+# Copyright (c) 2024 Bloodhound Project
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+##
+# = Bloodhound Deterministic Simulation
+##
+
+##
+# @BloodhoundNetworkFaultType:
+#
+# Types of network faults that can be injected
+#
+# @drop: Drop packets with given probability
+# @delay: Delay packets by a fixed amount
+# @corrupt: Corrupt packet data
+# @reorder: Reorder packets
+# @duplicate: Duplicate packets
+#
+# Since: 8.2
+##
+{ 'enum': 'BloodhoundNetworkFaultType',
+  'data': [ 'drop', 'delay', 'corrupt', 'reorder', 'duplicate' ] }
+
+##
+# @BloodhoundDiskFaultType:
+#
+# Types of disk faults that can be injected
+#
+# @read-error: Return read errors
+# @write-error: Return write errors
+# @slow-io: Delay I/O operations
+# @torn-write: Simulate torn/partial writes
+# @fsync-fail: Fail fsync operations
+# @disk-full: Simulate disk full condition
+#
+# Since: 8.2
+##
+{ 'enum': 'BloodhoundDiskFaultType',
+  'data': [ 'read-error', 'write-error', 'slow-io', 'torn-write',
+            'fsync-fail', 'disk-full' ] }
+
+##
+# @BloodhoundNetworkFault:
+#
+# Network fault specification
+#
+# @fault-type: Type of network fault
+# @interface: Target interface (optional, all if not specified)
+# @duration-ns: Duration in nanoseconds (optional, permanent if not specified)
+# @probability: Probability of fault (0.0 - 1.0)
+# @delay-ns: Delay in nanoseconds (for delay fault type)
+#
+# Since: 8.2
+##
+{ 'struct': 'BloodhoundNetworkFault',
+  'data': { 'fault-type': 'BloodhoundNetworkFaultType',
+            '*interface': 'str',
+            '*duration-ns': 'uint64',
+            'probability': 'number',
+            '*delay-ns': 'uint64' } }
+
+##
+# @BloodhoundDiskFault:
+#
+# Disk fault specification
+#
+# @fault-type: Type of disk fault
+# @drive: Target drive name
+# @duration-ns: Duration in nanoseconds (optional, permanent if not specified)
+# @probability: Probability of fault (0.0 - 1.0)
+# @delay-ns: Delay in nanoseconds (for slow-io fault type)
+#
+# Since: 8.2
+##
+{ 'struct': 'BloodhoundDiskFault',
+  'data': { 'fault-type': 'BloodhoundDiskFaultType',
+            'drive': 'str',
+            '*duration-ns': 'uint64',
+            'probability': 'number',
+            '*delay-ns': 'uint64' } }
+
+##
+# @BloodhoundDeterminismInfo:
+#
+# Information about determinism state
+#
+# @enabled: Whether deterministic mode is enabled
+# @virtual-time-ns: Current virtual time in nanoseconds
+# @instruction-count: Total instruction count
+# @rng-seed: Current RNG seed
+# @snapshot-id: Current snapshot ID
+#
+# Since: 8.2
+##
+{ 'struct': 'BloodhoundDeterminismInfo',
+  'data': { 'enabled': 'bool',
+            'virtual-time-ns': 'uint64',
+            'instruction-count': 'uint64',
+            'rng-seed': 'uint64',
+            'snapshot-id': 'uint64' } }
+
+##
+# @bloodhound-ctrl:
+#
+# Execute a Bloodhound control command for deterministic simulation.
+#
+# @type: Command type (set_time, advance_time, freeze_time, unfreeze_time,
+#                      set_seed, inject_network_fault, inject_disk_fault,
+#                      clear_faults, deterministic_snapshot, restore_snapshot,
+#                      query_determinism)
+# @time-ns: Virtual time in nanoseconds (for set_time)
+# @delta-ns: Time delta in nanoseconds (for advance_time)
+# @seed: RNG seed value (for set_seed)
+# @id: Snapshot identifier (for deterministic_snapshot, restore_snapshot)
+# @network-fault: Network fault specification (for inject_network_fault)
+# @disk-fault: Disk fault specification (for inject_disk_fault)
+#
+# Returns: BloodhoundDeterminismInfo for query_determinism, nothing otherwise
+#
+# Since: 8.2
+#
+# Example:
+#
+# -> { "execute": "bloodhound-ctrl",
+#      "arguments": { "type": "set_time", "time-ns": 1000000000 } }
+# <- { "return": {} }
+#
+# -> { "execute": "bloodhound-ctrl",
+#      "arguments": { "type": "query_determinism" } }
+# <- { "return": { "enabled": true, "virtual-time-ns": 1000000000,
+#                  "instruction-count": 50000, "rng-seed": 12345,
+#                  "snapshot-id": 0 } }
+##
+{ 'command': 'bloodhound-ctrl',
+  'data': { 'type': 'str',
+            '*time-ns': 'uint64',
+            '*delta-ns': 'uint64',
+            '*seed': 'uint64',
+            '*id': 'str',
+            '*network-fault': 'BloodhoundNetworkFault',
+            '*disk-fault': 'BloodhoundDiskFault' },
+  'returns': 'BloodhoundDeterminismInfo',
+  'allow-preconfig': true }

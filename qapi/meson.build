@@ -61,6 +61,7 @@ if have_system
     'acpi',
     'acpi-hest',
     'audio',
+    'bloodhound',
     'cryptodev',
     'qdev',
     'pci',
