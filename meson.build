@@ -2371,6 +2371,7 @@ foreach k : get_option('trace_backends')
 endforeach
 config_host_data.set_quoted('CONFIG_TRACE_FILE', get_option('trace_file'))
 config_host_data.set_quoted('CONFIG_TLS_PRIORITY', get_option('tls_priority'))
+config_host_data.set('CONFIG_BLOODHOUND', get_option('bloodhound'))
 if iasl.found()
   config_host_data.set_quoted('CONFIG_IASL', iasl.full_path())
 endif
@@ -3758,6 +3759,12 @@ if have_system
   subdir('hw')
 else
   subdir('hw/core')
+endif
+
+# Bloodhound deterministic execution support
+if get_option('bloodhound')
+  message('Bloodhound deterministic execution enabled')
+  subdir('bloodhound')
 endif
 
 if enable_modules

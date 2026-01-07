@@ -2874,6 +2874,17 @@ static void gen_multi0F(DisasContext *s, X86DecodedInsn *decode)
             s->base.is_jmp = DISAS_EOB_NEXT;
             break;
 
+        case 0xc1: /* VMCALL - Intel hypercall instruction */
+            /*
+             * Bloodhound: Handle VMCALL unconditionally in TCG mode.
+             * This allows guest hypercalls without requiring VT-x.
+             * Uses the same helper as AMD's VMMCALL.
+             */
+            gen_update_cc_op(s);
+            gen_update_eip_cur(s);
+            gen_helper_vmmcall(tcg_env);
+            break;
+
         CASE_MODRM_MEM_OP(1): /* sidt */
             if (s->flags & HF_UMIP_MASK && !check_cpl0(s)) {
                 break;

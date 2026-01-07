@@ -24,6 +24,8 @@
 #include "exec/cputlb.h"
 #include "accel/tcg/cpu-ldst.h"
 #include "tcg/helper-tcg.h"
+#include "bloodhound/state.h"
+#include "bloodhound/hypercall.h"
 
 /* Secure Virtual Machine helpers */
 
@@ -470,6 +472,19 @@ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
 
 void helper_vmmcall(CPUX86State *env)
 {
+    uint64_t hypercall_nr = env->regs[R_EAX];
+
+    /* Check if this is a Bloodhound hypercall */
+    if (IS_BLOODHOUND_HYPERCALL(hypercall_nr)) {
+        uint64_t arg1 = env->regs[R_EBX];
+        uint64_t arg2 = env->regs[R_ECX];
+        uint64_t arg3 = env->regs[R_EDX];
+
+        env->regs[R_EAX] = bloodhound_handle_hypercall(hypercall_nr,
+                                                        arg1, arg2, arg3);
+        return;
+    }
+
     cpu_svm_check_intercept_param(env, SVM_EXIT_VMMCALL, 0, GETPC());
     raise_exception(env, EXCP06_ILLOP);
 }

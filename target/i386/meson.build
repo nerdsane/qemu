@@ -30,6 +30,16 @@ if igvm.found()
   i386_system_ss.add(files('igvm.c'))
 endif
 
+# Bloodhound deterministic execution support (always included for now)
+i386_system_ss.add(files(
+  '../../bloodhound/determinism.c',
+  '../../bloodhound/time.c',
+  '../../bloodhound/random.c',
+  '../../bloodhound/io.c',
+  '../../bloodhound/snapshot.c',
+  '../../bloodhound/hypercall.c',
+))
+
 i386_user_ss = ss.source_set()
 
 subdir('kvm')

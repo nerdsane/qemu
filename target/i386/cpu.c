@@ -8373,6 +8373,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
         limit = env->cpuid_level;
     }
 
+    /* Bloodhound hypervisor CPUID leaf - always allow */
+    if (index == 0x42480000) {
+        uint32_t sig[3];
+        memcpy(sig, "BloodhoundHV", 12);
+        *eax = 0x42480000;  /* Max supported leaf */
+        *ebx = sig[0];
+        *ecx = sig[1];
+        *edx = sig[2];
+        return;
+    }
+
     if (index > limit) {
         /* Intel documentation states that invalid EAX input will
          * return the same information as EAX=cpuid_level
