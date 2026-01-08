@@ -42,6 +42,7 @@ qapi_all_modules = [
   'machine-s390x',
   'migration',
   'misc',
+  'bloodhound',
   'net',
   'pragma',
   'qom',

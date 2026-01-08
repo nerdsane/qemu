@@ -1,0 +1,46 @@
+# -*- Mode: Python -*-
+# vim: filetype=python
+#
+# Bloodhound Deterministic Execution QMP Interface
+
+##
+# @BloodhoundDeterminismInfo:
+#
+# Information about the current Bloodhound determinism state
+#
+# @enabled: Whether determinism mode is active
+# @virtual-time-ns: Current virtual time in nanoseconds
+# @instruction-count: Total instructions executed
+# @rng-seed: Current RNG seed
+# @snapshot-id: Current snapshot ID
+#
+# Since: 9.2
+##
+{ 'struct': 'BloodhoundDeterminismInfo',
+  'data': { 'enabled': 'bool',
+            'virtual-time-ns': 'uint64',
+            'instruction-count': 'uint64',
+            'rng-seed': 'uint64',
+            'snapshot-id': 'uint64' } }
+
+##
+# @bloodhound-ctrl:
+#
+# Bloodhound deterministic simulation control command.
+#
+# @type: Command type - one of: set_time, advance_time, freeze_time,
+#        unfreeze_time, set_seed, query_determinism
+# @time-ns: Absolute time for set_time
+# @delta-ns: Time delta for advance_time
+# @seed: RNG seed for set_seed
+#
+# Returns: BloodhoundDeterminismInfo with current state
+#
+# Since: 9.2
+##
+{ 'command': 'bloodhound-ctrl',
+  'data': { 'type': 'str',
+            '*time-ns': 'uint64',
+            '*delta-ns': 'uint64',
+            '*seed': 'uint64' },
+  'returns': 'BloodhoundDeterminismInfo' }

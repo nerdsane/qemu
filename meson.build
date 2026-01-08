@@ -3858,6 +3858,8 @@ endif
 common_ss.add(files('cpu-common.c'))
 user_ss.add(files('cpu-target.c'))
 system_ss.add(files('cpu-target.c'))
+# Bloodhound deterministic execution support
+system_ss.add(files('bloodhound/determinism.c', 'bloodhound/qmp.c'))
 
 subdir('system')
 
@@ -3896,6 +3898,7 @@ subdir('stats')
 subdir('tcg')
 subdir('fpu')
 subdir('accel')
+subdir('bloodhound')
 subdir('plugins')
 subdir('ebpf')
 
